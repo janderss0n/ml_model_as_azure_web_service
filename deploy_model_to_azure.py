@@ -12,8 +12,36 @@ from workspace import check_if_workspace_config_exists, \
                     load_workspace_from_config
 
 
-def create_score_file():
-    f = open('score.py','w+')
+def azure_register_model_and_deploy_as_web_service(subscription_id,
+                                workspace_settings, service_settings,
+                                model_settings, score_filename,
+                                environment_filename, container_settings):
+
+    ws = get_workspace(subscription_id, workspace_settings)
+    model = load_and_register_model_from_local_file(ws, **model_settings)
+
+    aciconfig = create_container_config_file(container_settings)
+    create_score_file(score_filename)
+    create_env_file(environment_filename)
+    image_config = create_container_image(execution_script=score_filename, conda_env_file=environment_filename)
+
+    if service_settings['create_new_service']:
+        deploy_new_web_service(ws, service_settings['service_name'], aciconfig, image_config, model)
+    else:
+        print('TO DO: create a function where you can update the webservice with new image. \
+            The from azureml.core.webservice import Webservice class has an update function.')
+
+
+
+def get_workspace(subscription_id, workspace_settings):
+    if not check_if_workspace_config_exists():
+        create_workspace_and_config_file(subscription_id, **workspace_settings)
+
+    return load_workspace_from_config()
+
+
+def create_score_file(score_filename):
+    f = open(score_filename,'w+')
     f.write('''import json
 import numpy as np
 import os
@@ -37,18 +65,8 @@ def run(raw_data):
     f.close()
 
 
-def get_workspace(subscription_id):#, workspace_settings):
-    if not check_if_workspace_config_exists():
-        create_workspace_and_config_file(subscription_id)
-        # create_workspace_and_config_file(subscription_id=subscription_id,
-        #                                 ws_name='test',
-        #                                 ws_resource_group='rg_test',
-        #                                 ws_location=workspace_settings['ws_location'])
-    return load_workspace_from_config()
-
-
-def create_env_file():
-    f = open('myenv.yml','w+')
+def create_env_file(environment_filename):
+    f = open(environment_filename,'w+')
     f.write('''name: project_environmen
 dependencies:
 # The python interpreter version.
@@ -64,11 +82,8 @@ dependencies:
     f.close()
 
 
-def create_vm_config_file():
-    return AciWebservice.deploy_configuration(cpu_cores=1,
-                           memory_gb=4,
-                           tags={'data': 'houseprice',  'method' : 'sklearn_ridge'},
-                           description='Predict house sale price')
+def create_container_config_file(container_settings):
+    return AciWebservice.deploy_configuration(**container_settings)
 
 
 def create_container_image(execution_script, conda_env_file):
@@ -77,18 +92,14 @@ def create_container_image(execution_script, conda_env_file):
                                                       conda_file=conda_env_file)
 
 
-def load_and_register_model_from_local_file(workspace):
-    #model = pkl.load(open('model.pkl', 'rb'))
-
-    model = Model.register(model_path='outputs/test_model.pkl',
-                        model_name='name_test_model',
+def load_and_register_model_from_local_file(workspace, local_model_path,
+                                            azure_model_name):
+    return Model.register(model_path=local_model_path,
+                        model_name=azure_model_name,
                         workspace=workspace)
-    return model
 
 
 def deploy_new_web_service(workspace, service_name, aciconfig, image_config, model):
-    for name, img in ws.images.items():
-        print (img.name, img.version, img.image_build_log_uri)
     service = Webservice.deploy_from_model(workspace=workspace,
                                            name=service_name,
                                            deployment_config=aciconfig,
@@ -96,36 +107,33 @@ def deploy_new_web_service(workspace, service_name, aciconfig, image_config, mod
                                            image_config=image_config)
 
     service.wait_for_deployment(show_output=True)
-    print(service.scoring_uri)
+    print('The URI to access the web service is: ', service.scoring_uri)
 
 
 if __name__=='__main__':
-    create_env_file()
     subscription_id = os.getenv('SUBSCRIPTION_ID')
-    # workspace_settings = {'ws_name': 'myworkspace',
-    #     'ws_resource_group': 'myresourcegroup',
-    #     'ws_location': 'westeurope'
-    # }
+    workspace_settings = {'ws_name': 'myworkspace',
+        'ws_resource_group': 'myresourcegroup',
+        'ws_location': 'westeurope'
+    }
     service_settings = {
         'service_name': 'testdeploy',
         'create_new_service': True
     }
+    score_filename = 'score.py'
+    environment_filename = 'myenv.yml'
+    container_settings = {
+        'cpu_cores': 1,
+        'memory_gb': 1,
+        'tags': {'data': 'SalePrice'},
+        'description': 'Describe your container here'
+    }
+    model_settings = {
+        'local_model_path': 'outputs/test_model.pkl',
+        'azure_model_name': 'name_test_model'
+    }
 
-    ws = get_workspace(subscription_id)#, workspace_settings)
-    model = load_and_register_model_from_local_file(ws)
-    create_score_file()
-    create_env_file()
-    with open('myenv.yml','r') as f:
-        print(f.read())
-        f.close()
-
-    aciconfig = create_vm_config_file()
-    image_config = create_container_image(execution_script='score.py', conda_env_file='myenv.yml')
-    deploy_new_web_service(ws, 'testdeploy', aciconfig, image_config, model)
-
-
-    # if service_settings['create_new_service']:
-    #     deploy_new_web_service(ws, 'testdeploy', aciconfig, image_config, model)
-    # else:
-    #     print('TO DO: create a function where you can update the webservice with new image. \
-    #         The from azureml.core.webservice import Webservice class has an update function.')
+    azure_register_model_and_deploy_as_web_service(subscription_id,
+                                    workspace_settings, service_settings,
+                                    model_settings, score_filename,
+                                    environment_filename, container_settings)

@@ -2,16 +2,12 @@ import os
 from azureml.core.workspace import Workspace
 
 
-# def create_workspace_and_config_file(subscription_id,
-#         ws_name,
-#         ws_resource_group,
-#         ws_location):
-def create_workspace_and_config_file(subscription_id):
+def create_workspace_and_config_file(subscription_id, ws_name, ws_resource_group, ws_location):
     ws = Workspace.create(subscription_id=subscription_id,
-                         name='test',
-                         resource_group='rg_test',
+                         name=ws_name,
+                         resource_group=ws_resource_group,
                          create_resource_group=True,
-                         location='westeurope')
+                         location=ws_location)
     ws.write_config()
 
 
