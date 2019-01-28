@@ -41,7 +41,10 @@ Score file: We have to create a score.py file which will be used in the web serv
 Environment file: We need to create an environment file which specifies all of the dependencies we will need.
 Container Instance config file: We need a configuration file which specifies how many CPU and how much memory we will need our container instances to have. You can also add tags to you container here to make it easier to search for in the Azure GUI.
 Container Image: Now we are ready to create our container image. We will need the score and the environment file for this.
-Deployment: Finally we can deploy the model into the Azure Workspace using the workspace, Container Instance config file, the model and the Container Image. (#TO DO: add the possibility to update the model)
+Deployment: Finally we can deploy the model into the Azure Workspace using the workspace, Container Instance config file, the model and the Container Image. (#TO DO: add the possibility to update the model) Here I used the function deploy_from_model, which also uploads you image to your workspace.
+
+If you like, you can first upload the image separately using Image.create and then deploy you azure container instance using deploy_from_image, here's a good link https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-troubleshoot-deployment.
+
 IMPORTANT: When you run this script you will get the address to the web server (a uri) printed in your terminal. This you will need in the next step. (Look something like http://999.99.99.999:99/score)
 
 4. Make predictions using the web server: To make predictions use the http_request_to_deployed_model.py. You need to change to your uri in the script which you got in step 3. First we will load the data that we want to make predictions on. Then we send this data as a post using the uri and we get predictions made by the model back. In this case I use the test data from step 1 which I also had the actual values for. I saved both the actual and the predictions to a csv file called prediction_made_on_test in the subdirectory called prediction.
