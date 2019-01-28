@@ -1,4 +1,4 @@
-#import os
+import os
 import pickle as pkl
 from azureml.core.model import Model
 from azureml.core.image import Image
