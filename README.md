@@ -24,6 +24,7 @@ conda install -y cython matplotlib scikit-learn pandas numpy
 
 
 # How this project is done
+## OBS: If you already have a trained model saved as a pickle file, move it to a subfolder called output and go to 3 for deployment. Step 1 and 2 are simple examples of data preprocessing and model training.
 1. Get the data: I downloaded the data into my directory and called the file train.csv.
 Preprocess the data: I use the script called process_data.py for the data preprocessing. This script removes all columns containing nan values and removes all columns not containing numbers. This it splits the training data into a train, test and validation dataset. Each dataset is written to a csv file into a subfolder called data.
 
