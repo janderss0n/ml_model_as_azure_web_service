@@ -1,6 +1,14 @@
 # Where I learned
 https://docs.microsoft.com/en-us/azure/machine-learning/service/
 
+## Files
+* create_model.py - train a model and save it as a pickle file.
+* deploy_model_to_azure.py - deploys the model as a web service to Azure.
+* eval_pred.py - simple evaluation of model prediction compared to actual.
+* http_request_to_deployed_model.py - request to the model web service.
+* process_data.py - simple preprocessing and splitting of data.
+* workspace.py - functions related to Azure workspace. Are used in deploy_model_to_azure.py.
+
 ## Dependencies/Installations
 Install azure cli
 Install conda, then run the following shell commands.
@@ -47,7 +55,7 @@ If you like, you can first upload the image separately using Image.create and th
 
 IMPORTANT: When you run this script you will get the address to the web server (a uri) printed in your terminal. This you will need in the next step. (Look something like http://999.99.99.999:99/score)
 
-4. Make predictions using the web server: To make predictions use the http_request_to_deployed_model.py. You need to change to your uri in the script which you got in step 3. First we will load the data that we want to make predictions on. Then we send this data as a post using the uri and we get predictions made by the model back. In this case I use the test data from step 1 which I also had the actual values for. I saved both the actual and the predictions to a csv file called prediction_made_on_test in the subdirectory called prediction.
+4. Make predictions using the web server: To make predictions use the http_request_to_deployed_model.py. You need to pass in your uri which you got in step 3 as an environment variable when you run the script. First we will load the data that we want to make predictions on. Then we send this data as a post using the uri and we get predictions made by the model back. In this case I use the test data from step 1 which I also had the actual values for. I saved both the actual and the predictions to a csv file called prediction_made_on_test in the subdirectory called prediction.
 
 5. Evaluation: Use the eval_pred.py to get a visualization of the prediction and r2 score.
 
@@ -55,6 +63,7 @@ IMPORTANT: When you run this script you will get the address to the web server (
 
 ## Notes
 If you have created the workspace config file and then deleted the workspace in azure, you will have to delete the config file locally as well if you want to dun the deployment again. #TO DO: If a workspace config file exists locally but not in azure, create that workspace anyway, without having to delete the config locally.
+
 
 ## Workspace
 If you want to deploy your model in azure you need to do this in a workspace.
