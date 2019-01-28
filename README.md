@@ -16,19 +16,19 @@ Install conda, then run the following shell commands.
 conda create -n myenv -y Python=3.6
 conda activate myenv #or: source activate myenv
 
-# Install Jupyter
+#### Install Jupyter
 conda install nb_conda
 
-# Install the base SDK and Jupyter Notebook
+#### Install the base SDK and Jupyter Notebook
 pip install azureml-sdk[notebooks]
 
-# Install the base SDK and auto ml components
+#### Install the base SDK and auto ml components
 pip install azureml-sdk[automl]
 
-# Install the base SDK and the model explainability component
+#### Install the base SDK and the model explainability component
 pip install azureml-sdk[explain]
 
-# Install the base SDK and experimental components
+#### Install the base SDK and experimental components
 pip install azureml-sdk[contrib]
 
 conda install -y cython matplotlib scikit-learn pandas numpy
