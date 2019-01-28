@@ -1,3 +1,6 @@
+# Where I learned
+https://docs.microsoft.com/en-us/azure/machine-learning/service/
+
 ## Dependencies/Installations
 Install azure cli
 Install conda, then run the following shell commands.
